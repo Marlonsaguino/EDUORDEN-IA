@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+venv/
+env/
+.venv/
+
+# Capturas temporales y datos de prueba
+capturas/*.jpg
+capturas/*.png
+dataset_entrenamiento/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

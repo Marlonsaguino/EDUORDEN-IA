@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduOrden IA - Panel de Control y Seguimiento Pedagógico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0F172A;
+      --bg-surface: #1E293B;
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --color-accent: #38BDF8;
+      --color-success: #10B981;
+      --color-warning: #F59E0B;
+      --color-card-blue: #3B82F6;
+      --color-card-amber: #F59E0B;
+      --color-card-green: #10B981;
+      --shadow-glow: 0 10px 25px -5px rgba(56, 189, 248, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, #1e1b4b, #0f172a 60%, #020617);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      padding: 20px 28px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #38BDF8, #6366F1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .brand-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #FFFFFF, #93C5FD);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 12px;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .badge-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--color-success);
+      box-shadow: 0 0 10px var(--color-success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+
+    /* GRID PRINCIPAL */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    /* CASILLEROS SECTION */
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lockers-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .locker-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 2px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .locker-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: var(--accent-bar, #64748B);
+    }
+
+    .locker-card.active-success {
+      border-color: var(--color-success);
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .locker-card.active-retry {
+      border-color: var(--color-warning);
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .pictogram-container {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      margin: 12px 0 16px 0;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      transition: transform 0.3s ease;
+    }
+
+    .locker-card:hover .pictogram-container {
+      transform: scale(1.08);
+    }
+
+    .locker-id {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .locker-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      margin: 4px 0 12px 0;
+    }
+
+    .locker-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    .locker-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 18px;
+      width: 100%;
+    }
+
+    .btn-sim {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sim:hover {
+      background: var(--color-accent);
+      color: #0f172a;
+      border-color: transparent;
+    }
+
+    /* FEEDBACK CARD */
+    .feedback-banner {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .feedback-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #10B981, #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .feedback-content h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .feedback-content p {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: #F8FAFC;
+    }
+
+    /* PANEL LATERAL DE MÉTRICAS */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .metrics-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .metric-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+    }
+
+    .metric-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--color-accent);
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* HISTORIAL DE EVENTOS */
+    .history-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .event-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      font-size: 13px;
+      border-left: 4px solid var(--border-color);
+    }
+
+    .event-item.item-correcto {
+      border-left-color: var(--color-success);
+    }
+
+    .event-item.item-incorrecto {
+      border-left-color: var(--color-warning);
+    }
+
+    .event-time {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    /* CONTROLES ACADÉMICOS DE EXPOSICIÓN */
+    .expo-toolbar {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #38BDF8, #2563EB);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🎒</div>
+      <div class="brand-text">
+        <h1>EduOrden IA</h1>
+        <p>Casilleros Inteligentes con Visión Computacional para el Fomento de la Autonomía Infantil</p>
+      </div>
+    </div>
+    <div class="header-badges">
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span>ESP32-CAM Conectada</span>
+      </div>
+      <div class="badge">
+        <span>Modelo: TFLite / MobileNet</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="main-grid">
+    <div>
+      <div class="section-title">
+        <span>📍</span> Estado de los Casilleros Inteligentes en Tiempo Real
+      </div>
+
+      <div class="lockers-container">
+        <!-- CASILLERO 1 -->
+        <div class="locker-card" id="card-casillero_1" style="--accent-bar: #3B82F6;">
+          <span class="locker-id">Casillero 1</span>
+          <h2 class="locker-name">Cuaderno</h2>
+          <div class="pictogram-container">📘</div>
+          <span class="locker-status" id="status-casillero_1">En espera</span>
+          <div class="locker-actions">
+            <button class="btn-sim" onclick="simularEvento('casillero_1', 'cuaderno')">Insertar Correcto</button>
+            <button class="btn-sim" onclick="simularEvento('casillero_1', 'botella')">Insertar Error</button>
+          </div>
+        </div>
+
+        <!-- CASILLERO 2 -->
+        <div class="locker-card" id="card-casillero_2" style="--accent-bar: #F59E0B;">
+          <span class="locker-id">Casillero 2</span>
+          <h2 class="locker-name">Estuche</h2>
+          <div class="pictogram-container">✏️</div>
+          <span class="locker-status" id="status-casillero_2">En espera</span>
+          <div class="locker-actions">
+            <button class="btn-sim" onclick="simularEvento('casillero_2', 'estuche')">Insertar Correcto</button>
+            <button class="btn-sim" onclick="simularEvento('casillero_2', 'cuaderno')">Insertar Error</button>
+          </div>
+        </div>
+
+        <!-- CASILLERO 3 -->
+        <div class="locker-card" id="card-casillero_3" style="--accent-bar: #10B981;">
+          <span class="locker-id">Casillero 3</span>
+          <h2 class="locker-name">Botella de Agua</h2>
+          <div class="pictogram-container">💧</div>
+          <span class="locker-status" id="status-casillero_3">En espera</span>
+          <div class="locker-actions">
+            <button class="btn-sim" onclick="simularEvento('casillero_3', 'botella')">Insertar Correcto</button>
+            <button class="btn-sim" onclick="simularEvento('casillero_3', 'estuche')">Insertar Error</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANNER DE RETROALIMENTACIÓN MULTISENSORIAL -->
+      <div class="feedback-banner">
+        <div class="feedback-avatar" id="avatar-feedback">✨</div>
+        <div class="feedback-content">
+          <h3 id="feedback-tipo">Retroalimentación para el Usuario</h3>
+          <p id="feedback-texto">Bienvenido a EduOrden IA. Por favor, selecciona un objeto escolar y colócalo en su casillero asignado.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL LATERAL -->
+    <div class="sidebar">
+      <!-- MÉTRICAS PEDAGÓGICAS -->
+      <div class="metrics-card">
+        <div class="section-title">
+          <span>📊</span> Indicadores de Autonomía
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <div class="metric-val" id="metric-aciertos">0</div>
+            <div class="metric-label">Aciertos Autónomos</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val" id="metric-tasa">100%</div>
+            <div class="metric-label">Tasa de Acierto</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val" id="metric-intentos">0</div>
+            <div class="metric-label">Total Intentos</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val" id="metric-reintentos">0</div>
+            <div class="metric-label">Reintentos Asistidos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTRO EN VIVO -->
+      <div class="history-card">
+        <div class="section-title">
+          <span>📝</span> Registro de Interacciones
+        </div>
+        <ul class="event-list" id="lista-eventos">
+          <li class="event-item">
+            <span>Sistema iniciado correctamente</span>
+            <span class="event-time">Listo</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR PARA DEMOSTRACIÓN ACADÉMICA -->
+  <div class="expo-toolbar">
+    <div>
+      <strong>Modo Demostración Académica:</strong> Puedes usar los botones de simulación o disparar imágenes reales desde la ESP32-CAM vía Wi-Fi.
+    </div>
+    <div style="display:flex; gap: 10px;">
+      <button class="btn-action" onclick="hablarMensaje('¡Hola! Soy EduOrden IA. Estoy listo para ayudarte a ordenar tus cosas.')">
+        🔊 Probar Voz
+      </button>
+      <button class="btn-action" onclick="reiniciarMetricas()" style="background: rgba(255,255,255,0.1);">
+        🔄 Reiniciar Métricas
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let totalIntentos = 0;
+    let aciertos = 0;
+    let reintentos = 0;
+
+    // Reproductor de voz integrado (Web Speech API)
+    function hablarMensaje(texto) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(texto);
+        utterance.lang = 'es-ES';
+        utterance.rate = 0.95; // Tono ligeramente más pausado para accesibilidad cognitiva
+        utterance.pitch = 1.1; // Tono amigable
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Efectos de sonido mediante Web Audio API
+    function reproducirSonidoExito() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+      osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
+      osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.35); // G5
+
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.7);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.7);
+    }
+
+    function reproducirSonidoReintento() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(392, audioCtx.currentTime + 0.3);
+
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    // Manejador central de eventos recibidos (de la ESP32 o simulados)
+    function procesarEvento(evento) {
+      totalIntentos++;
+      const esCorrecto = (evento.resultado === "CORRECTO");
+      if (esCorrecto) aciertos++; else reintentos++;
+
+      // Actualizar tarjeta del casillero
+      const card = document.getElementById(`card-${evento.casillero}`);
+      const statusSpan = document.getElementById(`status-${evento.casillero}`);
+
+      // Remover clases previas
+      card.classList.remove('active-success', 'active-retry');
+      void card.offsetWidth; // Trigger reflow
+
+      if (esCorrecto) {
+        card.classList.add('active-success');
+        statusSpan.textContent = `✅ Correcto (${evento.detectado})`;
+        statusSpan.style.color = '#10B981';
+        reproducirSonidoExito();
+      } else {
+        card.classList.add('active-retry');
+        statusSpan.textContent = `⚠️ Reintento (Puso: ${evento.detectado})`;
+        statusSpan.style.color = '#F59E0B';
+        reproducirSonidoReintento();
+      }
+
+      // Actualizar banner de retroalimentación
+      document.getElementById('feedback-tipo').textContent = esCorrecto ? "¡Refuerzo Positivo!" : "Indicación Amigable de Apoyo";
+      document.getElementById('feedback-texto').textContent = evento.mensaje;
+      document.getElementById('avatar-feedback').textContent = esCorrecto ? "🎉" : "💡";
+      document.getElementById('avatar-feedback').style.background = esCorrecto ? 
+        "linear-gradient(135deg, #10B981, #059669)" : "linear-gradient(135deg, #F59E0B, #D97706)";
+
+      // Síntesis de voz
+      hablarMensaje(evento.mensaje);
+
+      // Actualizar métricas
+      document.getElementById('metric-total') && (document.getElementById('metric-total').textContent = totalIntentos);
+      document.getElementById('metric-aciertos').textContent = aciertos;
+      document.getElementById('metric-intentos').textContent = totalIntentos;
+      document.getElementById('metric-reintentos').textContent = reintentos;
+      const tasa = Math.round((aciertos / totalIntentos) * 100);
+      document.getElementById('metric-tasa').textContent = `${tasa}%`;
+
+      // Agregar a lista de historial
+      const lista = document.getElementById('lista-eventos');
+      const item = document.createElement('li');
+      item.className = `event-item ${esCorrecto ? 'item-correcto' : 'item-incorrecto'}`;
+      item.innerHTML = `
+        <div>
+          <strong>${evento.casillero}</strong>: ${evento.detectado}
+          <div style="font-size:11px; color:#94A3B8;">${evento.resultado} (Confianza: ${evento.confianza}%)</div>
+        </div>
+        <span class="event-time">${new Date().toLocaleTimeString()}</span>
+      `;
+      lista.insertBefore(item, lista.firstChild);
+
+      // Restaurar estado visual a los 4 segundos
+      setTimeout(() => {
+        card.classList.remove('active-success', 'active-retry');
+        statusSpan.textContent = "En espera";
+        statusSpan.style.color = "#94A3B8";
+      }, 4000);
+    }
+
+    // Simulación directa en el navegador
+    function simularEvento(casilleroId, objeto) {
+      const mapaEsperados = {
+        "casillero_1": "cuaderno",
+        "casillero_2": "estuche",
+        "casillero_3": "botella"
+      };
+
+      const nombres = {
+        "cuaderno": "cuaderno escolar",
+        "estuche": "estuche de lápices",
+        "botella": "botella de agua"
+      };
+
+      const esperado = mapaEsperados[casilleroId];
+      const esCorrecto = (objeto === esperado);
+
+      const evento = {
+        casillero: casilleroId,
+        esperado: esperado,
+        detectado: objeto,
+        confianza: 95.8,
+        resultado: esCorrecto ? "CORRECTO" : "INCORRECTO",
+        mensaje: esCorrecto ? 
+          `¡Muy bien! El ${nombres[esperado]} está en su lugar correcto.` :
+          `Casi lo logras. Miremos bien el dibujo: este casillero es para el ${nombres[esperado]}.`
+      };
+
+      procesarEvento(evento);
+    }
+
+    function reiniciarMetricas() {
+      totalIntentos = 0;
+      aciertos = 0;
+      reintentos = 0;
+      document.getElementById('metric-aciertos').textContent = "0";
+      document.getElementById('metric-intentos').textContent = "0";
+      document.getElementById('metric-reintentos').textContent = "0";
+      document.getElementById('metric-tasa').textContent = "100%";
+      document.getElementById('lista-eventos').innerHTML = `
+        <li class="event-item">
+          <span>Métricas reiniciadas</span>
+          <span class="event-time">Listo</span>
+        </li>
+      `;
+    }
+
+    // Polling opcional al backend en Python si está activo en el puerto 5000
+    setInterval(async () => {
+      try {
+        const res = await fetch('http://localhost:5000/eventos');
+        if (res.ok) {
+          const data = await res.json();
+          // Si hay eventos nuevos desde la cámara física, procesarlos
+        }
+      } catch (e) {
+        // Modo offline / simulación activa
+      }
+    }, 3000);
+  </script>
+</body>
+</html>
